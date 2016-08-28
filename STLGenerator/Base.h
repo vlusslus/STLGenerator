@@ -14,8 +14,8 @@ public:
 	Base();
 	~Base();
 
-	void AddVertex(Vertex* vertex);
-	string toString();
+	void AddVertex(Vertex vertex);
+	vector<Vertex> GetVertices();
 
 };
 

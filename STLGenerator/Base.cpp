@@ -11,16 +11,13 @@ Base::~Base()
 {
 }
 
-void Base::AddVertex(Vertex* vertex)
+void Base::AddVertex(Vertex vertex)
 {
-	vertices.push_back(*vertex);
+	vertices.push_back(vertex);
 }
 
-string Base::toString()
+vector<Vertex> Base::GetVertices()
 {
-	string result;
-	for (int i = 0; i < vertices.size(); i++) {
-		result += "X: " + &vertices[i].getX + " " + "Y: " + &vertices[i].getY + " " + "Z: " + &vertices[i].getZ;
-		result += "/n";
-	}
+	return this->vertices;
 }
+
