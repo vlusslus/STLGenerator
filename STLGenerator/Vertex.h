@@ -25,8 +25,13 @@ class Vertex
 
 		string toString();
 
+		//Перегрузка: разность векторов
+		Vertex& operator-(const Vertex& right);
+
+		//Перегрузка: векторное произведение
+		Vertex& operator*(const Vertex& right);
 };
 
-const Vertex* operator-(const Vertex* right, const Vertex* left);
+ 
 
 

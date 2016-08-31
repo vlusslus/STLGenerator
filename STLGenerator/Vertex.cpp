@@ -38,7 +38,7 @@ const double Vertex::getZ()
 
 string Vertex::toString()
 {
-	return "X: " + to_string(this->x) + " " + "Y: " + to_string(this->y) + " " + "Z: " + to_string(this->z);
+	return to_string(this->x) + " " + to_string(this->y) + " " + to_string(this->z);
 }
 
 void Vertex::setZ(const double z)
@@ -46,10 +46,20 @@ void Vertex::setZ(const double z)
 	this->z = z;
 }
 
-const Vertex* operator-(const Vertex* right, const Vertex* left)
+Vertex& Vertex::operator-(const Vertex& right)
 {
-	return new Vertex(right->getX - left->getX, right->getY - left->getY, right->getZ - left->getZ);
-	
+	Vertex* result = new Vertex(this->x - right.x, this->y - right.y, this->z - right.z);
+	return *result;
+}
+
+Vertex& Vertex::operator*(const Vertex& right)
+{
+	Vertex* result = new Vertex(
+		this->y * right.z - this->z * right.y,
+		this->z * right.x - this->x * right.z,
+		this->x * right.y - this->y * right.x
+	);
+	return *result;
 }
 
 
