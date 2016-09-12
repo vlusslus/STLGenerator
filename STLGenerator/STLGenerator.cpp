@@ -3,43 +3,71 @@
 #include "stdafx.h"
 #include "iostream"
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cstdio>
 
 #include "Base.h"
 #include "Facet.h"
+#include "InputParams.h"
 
 #define PI 3.14159265  
-
-
 
 using namespace std;
 
 const int fullRad = 360;
 const int countVer = 30;
-const double radio = 20;
+const double radio = 5;
 const double height = 30;
 
 int main()
 {
+	string inLine;
+	int indexInLine = 0;
+	ifstream in;
+	in.open("input.txt");
 
-	fstream myfile;
-	myfile.open("out.stl");
-	//myfile << "Writing this to a file.\n";
+	InputParams *inputParams = new InputParams(in);
+	cout << inputParams->toString();
+
 	
+	
+	vector<Vertex> verticesRectDown;
+	vector<Vertex> verticesRectUp;
+
+
+	
+	Vertex* vertex = new Vertex(0, 0 ,0);
+	verticesRectDown.push_back(*vertex);
+	vertex = new Vertex(50, 0, 0);
+	verticesRectDown.push_back(*vertex);
+	vertex = new Vertex(50, 50, 0);
+	verticesRectDown.push_back(*vertex);
+	vertex = new Vertex(0, 50, 0);
+	verticesRectDown.push_back(*vertex);
+
+	vertex = new Vertex(0, 0, 10);
+	verticesRectUp.push_back(*vertex);
+	vertex = new Vertex(50, 0, 10);
+	verticesRectUp.push_back(*vertex);
+	vertex = new Vertex(50, 50, 10);
+	verticesRectUp.push_back(*vertex);
+	vertex = new Vertex(0, 50, 10);
+	verticesRectUp.push_back(*vertex);
 
 
 
 	double angleStep = fullRad/countVer;
 	Base* baseUp = new Base();
 	Base* baseDown = new Base();
+
 	for (int angle = 0; angle <= fullRad; angle += angleStep) 
 	{
 		//double angle = fullRad / currVer;
 		cout << "Angle ";
 		cout << angle;
 		cout << "\n";
-		Vertex* vertex = new Vertex(radio*cos(angle * PI/180), radio*sin(angle * PI / 180), 0);
+		Vertex* vertex = new Vertex(30 + radio*cos(angle * PI/180), 30 + radio*sin(angle * PI / 180), 10);
 		baseDown->AddVertex(*vertex);
 		vertex->setZ(height);
 		baseUp->AddVertex(*vertex);
@@ -79,6 +107,31 @@ int main()
 		facets.push_back(facet);
 	}
 
+	//Треугольники площадки
+	for (int indexDown = 0; indexDown < verticesRectDown.size()-1; indexDown++)
+	{
+		Facet* facet = new Facet(&verticesRectDown[indexDown], &verticesRectDown[indexDown + 1], &verticesRectUp[indexDown]);
+		facets.push_back(facet);
+	}
+
+	for (int indexUp = verticesRectUp.size()-1; indexUp > 0; indexUp--)
+	{
+		Facet* facet = new Facet(&verticesRectUp[indexUp], &verticesRectUp[indexUp - 1], &verticesRectDown[indexUp]);
+		facets.push_back(facet);
+	}
+
+	Facet* facet1 = new Facet(&verticesRectDown[0], &verticesRectDown[1], &verticesRectDown[2]);
+	facets.push_back(facet1);
+
+	Facet* facet2 = new Facet(&verticesRectDown[2], &verticesRectDown[3], &verticesRectDown[0]);
+	facets.push_back(facet2);
+
+	Facet* facet3 = new Facet(&verticesRectUp[0], &verticesRectUp[1], &verticesRectUp[2]);
+	facets.push_back(facet3);
+
+	Facet* facet4 = new Facet(&verticesRectUp[2], &verticesRectUp[3], &verticesRectUp[0]);
+	facets.push_back(facet4);
+	
 	//Треугольники оснований
 	for (int index = 0; index < countVer-2; index++)
 	{
@@ -87,28 +140,30 @@ int main()
 		facets.push_back(facetDowm);
 		facets.push_back(facetUp);
 	}
+	fstream out;
+	out.open("out.stl");
 
-	myfile << "solid OpenSCAD_Model\n";
+	out << "solid OpenSCAD_Model\n";
 	//Вычисленные нормали
 	for (int index = 0; index < facets.size(); index++) {
-		myfile << "  facet normal ";
-		myfile << facets[index]->getN().toString();
-		myfile << "\n";
-		myfile << "    outer loop\n";
-		myfile << "      vertex ";
-		myfile << facets[index]->getA().toString();
-		myfile << "\n";
-		myfile << "      vertex ";
-		myfile << facets[index]->getB().toString();
-		myfile << "\n";
-		myfile << "      vertex ";
-		myfile << facets[index]->getC().toString();
-		myfile << "\n";
-		myfile << "    endloop\n";
-		myfile << "  endfacet\n";
+		out << "  facet normal ";
+		out << facets[index]->getN().toString();
+		out << "\n";
+		out << "    outer loop\n";
+		out << "      vertex ";
+		out << facets[index]->getA().toString();
+		out << "\n";
+		out << "      vertex ";
+		out << facets[index]->getB().toString();
+		out << "\n";
+		out << "      vertex ";
+		out << facets[index]->getC().toString();
+		out << "\n";
+		out << "    endloop\n";
+		out << "  endfacet\n";
 	}
-	myfile << "endsolid OpenSCAD_Model";
-	myfile.close();
+	out << "endsolid OpenSCAD_Model";
+	out.close();
 
 	cin.get();
 
