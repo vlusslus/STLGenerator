@@ -32,7 +32,7 @@ InputParams::InputParams(ifstream &in)
 		}
 		else
 		{
-			if (!(iss >> this->RectX >> this->RectY) >> this->RectH >> this->CircH >> this->CircR)
+			if (!(iss >> this->RectX >> this->RectY >> this->RectH >> this->CircH >> this->CircR))
 			{
 				break;
 			}
@@ -56,4 +56,9 @@ string InputParams::toString()
 		result += to_string(this->circle[i].first) + " " + to_string(this->circle[i].second) + "\n";
 	}
 	return result;
+}
+
+vector<pair<int, int>> InputParams::getCirclesPair()
+{
+	return this->circle;
 }

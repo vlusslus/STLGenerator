@@ -19,6 +19,9 @@ private:
 public:
 	InputParams(ifstream &in);
 	~InputParams();
+
 	string toString();
+	vector<pair<int, int>> getCirclesPair();
+
 };
 
