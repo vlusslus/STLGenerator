@@ -5,14 +5,14 @@
 
 
 
-Facet::Facet(Vertex* A, Vertex* B, Vertex* C)
+Facet::Facet(Vertex A, Vertex B, Vertex C)
 {
 	this->A = A;
 	this->B = B;
 	this->C = C;
 
-	Vertex ba = *B - *A;
-	Vertex ca = *C - *A;
+	Vertex ba = B - A;
+	Vertex ca = C - A;
 
 	this->N = ba * ca;
 	//this->O = this->N;
@@ -41,13 +41,13 @@ Vertex Facet::getN() {
 }
 
 Vertex Facet::getA() {
-	return *A;
+	return A;
 }
 
 Vertex Facet::getB() {
-	return *B;
+	return B;
 }
 
 Vertex Facet::getC() {
-	return *C;
+	return C;
 }

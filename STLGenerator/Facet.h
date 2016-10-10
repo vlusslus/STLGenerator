@@ -6,14 +6,14 @@ class Facet
 {
 private:
 
-	Vertex* A;
-	Vertex* B;
-	Vertex* C;
+	Vertex A;
+	Vertex B;
+	Vertex C;
 	//Vertex O;
 	Vertex N;
 
 public:
-	Facet(Vertex* A, Vertex* B, Vertex* C);
+	Facet(Vertex A, Vertex B, Vertex C);
 	~Facet();
 
 	Vertex getA();
