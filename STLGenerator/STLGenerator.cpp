@@ -75,7 +75,7 @@ int main()
 			//cout << "Angle ";
 			//cout << angle;
 			//cout << "\n";
-			Vertex* vertex = new Vertex(circle.first + radio*cos(angle * PI / 180), circle.second + radio*sin(angle * PI / 180), 10);
+			Vertex* vertex = new Vertex(rectX - circle.first + radio*cos(angle * PI / 180), circle.second + radio*sin(angle * PI / 180), 10);
 			baseDown->AddVertex(*vertex);
 			vertex->setZ(15);
 			baseUp->AddVertex(*vertex);
