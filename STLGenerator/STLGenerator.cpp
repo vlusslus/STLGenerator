@@ -16,8 +16,8 @@
 
 using namespace std;
 
-int main()
-{
+void buildGlif() {
+
 	string inLine;
 	int indexInLine = 0;
 	ifstream in;
@@ -31,8 +31,8 @@ int main()
 	const double radio = 5;
 	const double height = 30;
 
-	
-	
+
+
 	vector<Vertex> verticesRectDown;
 	vector<Vertex> verticesRectUp;
 
@@ -40,8 +40,8 @@ int main()
 	int rectY = 630;
 
 
-	
-	Vertex* vertex = new Vertex(0, 0 ,0);
+
+	Vertex* vertex = new Vertex(0, 0, 0);
 	verticesRectDown.push_back(*vertex);
 	vertex = new Vertex(rectX, 0, 0);
 	verticesRectDown.push_back(*vertex);
@@ -63,7 +63,7 @@ int main()
 	vector<Base> circlesUp;
 
 	double angleStep = fullRad / countVer;
-
+	int h = 15;
 	for (int i = 0; i < inputParams->getCirclesPair().size(); i++)
 	{
 		Base* baseUp = new Base();
@@ -77,11 +77,17 @@ int main()
 			//cout << "\n";
 			Vertex* vertex = new Vertex(rectX - circle.first + radio*cos(angle * PI / 180), circle.second + radio*sin(angle * PI / 180), 10);
 			baseDown->AddVertex(*vertex);
-			vertex->setZ(15);
+			vertex->setZ(h);
 			baseUp->AddVertex(*vertex);
 		}
 		circlesDown.push_back(*baseDown);
 		circlesUp.push_back(*baseUp);
+		//-------------------------------
+		vector<Base> sphericals;
+		for (int j = 0; j <= 3; j++) {
+			Vertex* vertex = new Vertex();
+		}
+
 	}
 
 	for (int i = 0; i < circlesDown.size(); i++) {
@@ -125,21 +131,21 @@ int main()
 		facetCircles.push_back(facets);
 	}
 
-	cout<<(facetCircles[0][0]->getA()).toString();
+	cout << (facetCircles[0][0]->getA()).toString();
 
 
 	vector<Facet*> rectFacets;
 
-	
+
 
 	//Треугольники площадки
-	for (int indexDown = 0; indexDown < verticesRectDown.size()-1; indexDown++)
+	for (int indexDown = 0; indexDown < verticesRectDown.size() - 1; indexDown++)
 	{
 		Facet* facet = new Facet(verticesRectDown[indexDown], verticesRectDown[indexDown + 1], verticesRectUp[indexDown]);
 		rectFacets.push_back(facet);
 	}
 
-	for (int indexUp = verticesRectUp.size()-1; indexUp > 0; indexUp--)
+	for (int indexUp = verticesRectUp.size() - 1; indexUp > 0; indexUp--)
 	{
 		Facet* facet = new Facet(verticesRectUp[indexUp], verticesRectUp[indexUp - 1], verticesRectDown[indexUp]);
 		rectFacets.push_back(facet);
@@ -156,14 +162,14 @@ int main()
 
 	Facet* facet4 = new Facet(verticesRectUp[2], verticesRectUp[3], verticesRectUp[0]);
 	rectFacets.push_back(facet4);
-	
-	
+
+
 	fstream out;
 	out.open("out.stl");
 
 	out << "solid OpenSCAD_Model\n";
 	//Вычисленные нормали
-	for (int v=0; v < facetCircles.size(); v++) 
+	for (int v = 0; v < facetCircles.size(); v++)
 	{
 		for (int index = 0; index < facetCircles[v].size(); index++) {
 			out << "  facet normal ";
@@ -201,12 +207,104 @@ int main()
 		out << "    endloop\n";
 		out << "  endfacet\n";
 	}
-	
+
 	out << "endsolid OpenSCAD_Model";
 	out.close();
 
 	cin.get();
 
-    return 0;
 }
 
+void buildSpherical() {
+
+	pair<int, int>* center = new pair<int, int>(100, 100);
+	int radio = 50;
+	int height = 25;
+	int heightStep = 5;
+	int fullRad = 360;
+	int angleStep = 10;
+
+	vector<Base> bases;
+	for (int h = 0; h <= height; h += heightStep) {
+
+		Base* base = new  Base();
+		for (int angle = 0; angle <= fullRad; angle += angleStep)
+		{
+			Vertex* vertex = new Vertex(center->first + radio*cos(angle * PI / 180), center->second + radio*sin(angle * PI / 180), h);
+			base->AddVertex(*vertex);
+			if (radio == 0) {
+				break;
+			}
+		}
+		radio -= radio / (height / heightStep);
+		bases.push_back(*base);
+	}
+
+	vector<vector<Facet*>> facetsAll;
+	vector<Facet*> facetOne;
+	for (int indBase = 0; indBase <= bases.size()-2; indBase++) {
+		vector<Vertex> verticesDown = bases[indBase].GetVertices();
+		vector<Vertex> verticesUp = bases[indBase].GetVertices();
+
+		int vertCount = verticesDown.size();
+
+		for (int indexDown = 0; indexDown < vertCount-1; indexDown++)
+		{
+			Facet* facet = new Facet(verticesDown[indexDown], verticesDown[indexDown + 1], verticesUp[indexDown]);
+			facetOne.push_back(facet);
+		}
+
+		for (int indexUp = vertCount-1; indexUp > 0; indexUp--)
+		{
+			Facet* facet = new Facet(verticesUp[indexUp], verticesDown[indexUp - 1], verticesDown[indexUp]);
+			facetOne.push_back(facet);
+		}
+
+		facetsAll.push_back(facetOne);
+	}
+
+	fstream out;
+	out.open("out.stl");
+
+	out << "solid OpenSCAD_Model\n";
+	//Вычисленные нормали
+	for (int v = 0; v < facetsAll.size(); v++)
+	{
+		for (int index = 0; index < facetsAll[v].size(); index++) {
+			out << "  facet normal ";
+			out << facetsAll[v][index]->getN().toString();
+			out << "\n";
+			out << "    outer loop\n";
+			out << "      vertex ";
+			out << facetsAll[v][index]->getA().toString();
+			out << "\n";
+			out << "      vertex ";
+			out << facetsAll[v][index]->getB().toString();
+			out << "\n";
+			out << "      vertex ";
+			out << facetsAll[v][index]->getC().toString();
+			out << "\n";
+			out << "    endloop\n";
+			out << "  endfacet\n";
+		}
+	}
+
+	out << "endsolid OpenSCAD_Model";
+	out.close();
+
+	std:cout << "End!";
+
+
+	cin.get();
+
+}
+
+int main()
+{
+	//buildGlif();
+
+	buildSpherical();
+
+	return 0;
+
+}
