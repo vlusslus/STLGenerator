@@ -131,7 +131,7 @@ void buildGlif() {
 		facetCircles.push_back(facets);
 	}
 
-	cout << (facetCircles[0][0]->getA()).toString();
+	//cout << (facetCircles[0][0]->getA()).toString();
 
 
 	vector<Facet*> rectFacets;
@@ -145,11 +145,17 @@ void buildGlif() {
 		rectFacets.push_back(facet);
 	}
 
-	for (int indexUp = verticesRectUp.size() - 1; indexUp > 0; indexUp--)
+	for (int indexUp = verticesRectUp.size()-1; indexUp > 0; indexUp--)
 	{
 		Facet* facet = new Facet(verticesRectUp[indexUp], verticesRectUp[indexUp - 1], verticesRectDown[indexUp]);
 		rectFacets.push_back(facet);
 	}
+
+	Facet* facet5 = new Facet(verticesRectUp[0], verticesRectUp[3], verticesRectDown[0]);
+	rectFacets.push_back(facet5);
+
+	Facet* facet6 = new Facet(verticesRectDown[0], verticesRectDown[3], verticesRectUp[3]);
+	rectFacets.push_back(facet6);
 
 	Facet* facet1 = new Facet(verticesRectDown[0], verticesRectDown[1], verticesRectDown[2]);
 	rectFacets.push_back(facet1);
@@ -236,31 +242,42 @@ void buildSpherical() {
 				break;
 			}
 		}
-		radio -= radio / (height / heightStep);
+		radio -= 50 / (height / heightStep);
 		bases.push_back(*base);
 	}
 
 	vector<vector<Facet*>> facetsAll;
 	vector<Facet*> facetOne;
-	for (int indBase = 0; indBase <= bases.size()-2; indBase++) {
+	for (int indBase = 0; indBase < bases.size()-1; indBase++) {
 		vector<Vertex> verticesDown = bases[indBase].GetVertices();
-		vector<Vertex> verticesUp = bases[indBase].GetVertices();
+		vector<Vertex> verticesUp = bases[indBase+1].GetVertices();
 
-		int vertCount = verticesDown.size();
+		int vertCountDown = verticesDown.size();
+		int vertCountUp = verticesUp.size();
 
-		for (int indexDown = 0; indexDown < vertCount-1; indexDown++)
-		{
-			Facet* facet = new Facet(verticesDown[indexDown], verticesDown[indexDown + 1], verticesUp[indexDown]);
-			facetOne.push_back(facet);
+		if (vertCountUp != 1) {
+			for (int indexDown = 0; indexDown < vertCountDown - 1; indexDown++)
+			{
+				Facet* facet = new Facet(verticesDown[indexDown], verticesDown[indexDown + 1], verticesUp[indexDown]);
+				facetOne.push_back(facet);
+			}
+
+			for (int indexUp = vertCountDown - 1; indexUp > 0; indexUp--)
+			{
+				Facet* facet = new Facet(verticesUp[indexUp], verticesUp[indexUp - 1], verticesDown[indexUp]);
+				facetOne.push_back(facet);
+			}
+
+			facetsAll.push_back(facetOne);
 		}
-
-		for (int indexUp = vertCount-1; indexUp > 0; indexUp--)
-		{
-			Facet* facet = new Facet(verticesUp[indexUp], verticesDown[indexUp - 1], verticesDown[indexUp]);
-			facetOne.push_back(facet);
+		else {
+			for (int indexDown = 0; indexDown < vertCountDown - 1; indexDown++)
+			{
+				Facet* facet = new Facet(verticesDown[indexDown], verticesDown[indexDown + 1], verticesUp[0]);
+				facetOne.push_back(facet);
+			}
 		}
-
-		facetsAll.push_back(facetOne);
+		
 	}
 
 	fstream out;
@@ -301,9 +318,9 @@ void buildSpherical() {
 
 int main()
 {
-	//buildGlif();
+	buildGlif();
 
-	buildSpherical();
+	//buildSpherical();
 
 	return 0;
 

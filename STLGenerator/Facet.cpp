@@ -27,8 +27,11 @@ Facet::Facet(Vertex A, Vertex B, Vertex C)
 		max = abs(this->N.getZ());
 	}
 
-	Vertex* N = new Vertex(this->N.getX() / max, this->N.getY() / max, this->N.getZ() / max);
-	this->N = *N;
+	if (max != 0) {
+		Vertex* N = new Vertex(this->N.getX() / max, this->N.getY() / max, this->N.getZ() / max);
+		this->N = *N;
+	}
+
 }
 
 
